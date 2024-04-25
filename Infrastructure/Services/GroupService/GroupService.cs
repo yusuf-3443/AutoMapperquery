@@ -2,23 +2,35 @@ using System.Net;
 using AutoMapper;
 using Domain.DTOs.GroupDTO;
 using Domain.Entities;
+using Domain.Filters;
 using Domain.Responses;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 public class GroupService(IMapper mapper, DataContext context) : IGroupService
 {
- public async Task<Response<List<GetGroupDto>>> GetGroups()
+    
+ public async Task<PagedResponse<List<GetGroupDto>>> GetGroups(GroupFilter filter)
  {
     try
     {
-        var groups = await context.Groups.ToListAsync();
-        var mapped = mapper.Map<List<GetGroupDto>>(groups);
-        return new Response<List<GetGroupDto>>(mapped);
+        var groups = context.Groups.AsQueryable();
+
+        if(!string.IsNullOrEmpty(filter.GroupName))
+        groups = groups.Where(x=>x.GroupName.ToLower().Contains(filter.GroupName.ToLower()));
+
+        var response = await groups
+                .Skip((filter.PageNumber - 1) * filter.PageSize)
+                .Take(filter.PageSize).ToListAsync();
+        var totalRecord = groups.Count();
+
+        var mapped = mapper.Map<List<GetGroupDto>>(response);
+        return new PagedResponse<List<GetGroupDto>>(mapped,filter.PageNumber,filter.PageSize,totalRecord);
     }
-    catch (Exception e)
+    catch (System.Exception)
     {
-        return new Response<List<GetGroupDto>>(HttpStatusCode.InternalServerError,e.Message);
+        
+        throw;
     }
  }
     public async Task<Response<GetGroupDto>> GetGroupById(int id)
@@ -78,5 +90,19 @@ public class GroupService(IMapper mapper, DataContext context) : IGroupService
         {
             return new Response<bool>(HttpStatusCode.InternalServerError,e.Message);
         }
+    }
+
+    public async Task<List<GetGroupStudent>> GetGroupStudentsCount()
+    {
+        var sql = await (from g in context.Groups
+        join sg in context.StudentGroups on g.Id equals sg.GroupId
+        join s in context.Students on sg.StudentId equals s.Id
+        let count = context.Students.Count(x=>x.Id==sg.StudentId)
+        select new GetGroupStudent
+        {
+            Group = g,
+            StudentCount = count
+        }).ToListAsync();
+        return new List<GetGroupStudent>(sql);
     }
 }

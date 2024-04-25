@@ -2,7 +2,9 @@ using System.Data.Common;
 using System.Net;
 using AutoMapper;
 using Domain.DTOs.MentorDto;
+using Domain.DTOs.MentorDTO;
 using Domain.Entities;
+using Domain.Filters;
 using Domain.Responses;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -20,21 +22,26 @@ namespace Infrastructure.Services.MentorService
             _mapper = mapper;
         }
 
-        public async Task<Response<List<GetMentorDto>>> GetMentorsAsync()
+        public async Task<PagedResponse<List<GetMentorDto>>> GetMentorsAsync(MentorFilter filter)
         {
             try
             {
-                var mentors = await _context.Mentors.ToListAsync();
-                var mapped = _mapper.Map<List<GetMentorDto>>(mentors);
-                return new Response<List<GetMentorDto>>(mapped);
-            }
-            catch (DbException dbEx)
-            {
-                return new Response<List<GetMentorDto>>(HttpStatusCode.InternalServerError, dbEx.Message);
+                var mentors = _context.Mentors.AsQueryable();
+
+                if(filter.Status>0)
+                mentors = mentors.Where(x=>x.Status==filter.Status);
+
+                var response = await mentors
+                .Skip((filter.PageNumber - 1) * filter.PageSize)
+                .Take(filter.PageSize).ToListAsync();
+                var totalRecord = mentors.Count();
+
+                var mapped = _mapper.Map<List<GetMentorDto>>(response);
+                return new PagedResponse<List<GetMentorDto>>(mapped, filter.PageNumber, filter.PageSize, totalRecord);
             }
             catch (Exception ex)
             {
-                return new Response<List<GetMentorDto>>(HttpStatusCode.InternalServerError, ex.Message);
+                return new PagedResponse<List<GetMentorDto>>(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
 
@@ -104,6 +111,11 @@ namespace Infrastructure.Services.MentorService
             {
                 return new Response<bool>(HttpStatusCode.InternalServerError, e.Message);
             }
+        }
+
+        public Task<Response<List<GetMentorMoreThenOneGroup>>> GetMentorMoreThenOneGroup()
+        {
+            throw new NotImplementedException();
         }
     }
 }

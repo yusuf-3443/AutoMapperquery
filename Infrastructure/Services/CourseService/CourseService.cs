@@ -2,6 +2,7 @@ using System.Net;
 using AutoMapper;
 using Domain.DTOs.CourseDTO;
 using Domain.Entities;
+using Domain.Filters;
 using Domain.Responses;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -10,17 +11,24 @@ namespace Infrastructure.Services.CourseService;
 
 public class CourseService(DataContext context, IMapper mapper) : ICourseService
 {
-    public async Task<Response<List<GetCourseDto>>> GetCourses()
+    public async Task<PagedResponse<List<GetCourseDto>>> GetCourses(CourseFilter filter)
     {
         try
         {
-            var courses = await context.Courses.ToListAsync();
-            var mapped = mapper.Map<List<GetCourseDto>>(courses);
-            return new Response<List<GetCourseDto>>(mapped);
+            var courses = context.Courses.AsQueryable();
+
+            if(!string.IsNullOrEmpty(filter.CourseName))
+            courses = courses.Where(x=>x.CourseName.ToLower().Contains(filter.CourseName.ToLower()));
+            var response = await courses
+                .Skip((filter.PageNumber - 1) * filter.PageSize)
+                .Take(filter.PageSize).ToListAsync();
+            var totalRecord = courses.Count();
+            var mapped = mapper.Map<List<GetCourseDto>>(response);
+            return new PagedResponse<List<GetCourseDto>>(mapped,filter.PageNumber,filter.PageSize,totalRecord);
         }
         catch (Exception e)
         {
-            return new Response<List<GetCourseDto>>(HttpStatusCode.InternalServerError, e.Message);
+            return new PagedResponse<List<GetCourseDto>>(HttpStatusCode.InternalServerError, e.Message);
         }
     }
 

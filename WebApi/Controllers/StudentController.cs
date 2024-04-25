@@ -1,4 +1,5 @@
 using Domain.DTOs.StudentDTO;
+using Domain.Filters;
 using Domain.Responses;
 using Infrastructure.Services.StudentService;
 using Microsoft.AspNetCore.Mvc;
@@ -9,9 +10,9 @@ namespace WebApi.Controllers;
 public class StudentController(IStudentService studentService) : ControllerBase
 {
     [HttpGet("get-students")]
-    public async Task<Response<List<GetStudentDto>>> GetStudentsAsync()
+    public async Task<Response<List<GetStudentDto>>> GetStudentsAsync ([FromQuery]StudentFilter filter)
     {
-        return await studentService.GetStudentsAsync();
+        return await studentService.GetStudentsAsync(filter);
     }
     [HttpGet("{studentId:int}")]
     public async Task<Response<GetStudentDto>> GetStudentByIdAsync(int studentId)

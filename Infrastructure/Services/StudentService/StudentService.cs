@@ -3,6 +3,7 @@ using System.Net;
 using AutoMapper;
 using Domain.DTOs.StudentDTO;
 using Domain.Entities;
+using Domain.Filters;
 using Domain.Responses;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -13,21 +14,31 @@ public class StudentService(DataContext context, IMapper mapper) : IStudentServi
 {
     #region GetStudentsAsync
 
-    public async Task<Response<List<GetStudentDto>>> GetStudentsAsync()
+
+
+    public async Task<PagedResponse<List<GetStudentDto>>> GetStudentsAsync(StudentFilter filter)
     {
         try
         {
-            var students = await context.Students.ToListAsync();
-            var mapped = mapper.Map<List<GetStudentDto>>(students);
-            return new Response<List<GetStudentDto>>(mapped);
+            var students = context.Students.AsQueryable();
+
+            if (!string.IsNullOrEmpty(filter.Address))
+                students = students.Where(x => x.Address.ToLower().Contains(filter.Address.ToLower()));
+            if (!string.IsNullOrEmpty(filter.Email))
+                students = students.Where(x => x.Email.ToLower().Contains(filter.Email.ToLower()));
+
+            var response = await students
+                .Skip((filter.PageNumber - 1) * filter.PageSize)
+                .Take(filter.PageSize).ToListAsync();
+            var totalRecord = students.Count();
+
+            var mapped = mapper.Map<List<GetStudentDto>>(response);
+            return new PagedResponse<List<GetStudentDto>>(mapped, filter.PageNumber, filter.PageSize, totalRecord);
+
         }
-        catch (DbException dbEx)
+        catch (Exception e)
         {
-            return new Response<List<GetStudentDto>>(HttpStatusCode.InternalServerError, dbEx.Message);
-        }
-        catch (Exception ex)
-        {
-            return new Response<List<GetStudentDto>>(HttpStatusCode.InternalServerError, ex.Message);
+            return new PagedResponse<List<GetStudentDto>>(HttpStatusCode.InternalServerError, e.Message);
         }
     }
 

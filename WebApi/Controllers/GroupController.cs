@@ -1,5 +1,6 @@
 using Domain.DTOs.CourseDTO;
 using Domain.DTOs.GroupDTO;
+using Domain.Filters;
 using Domain.Responses;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,10 +10,15 @@ namespace WebApi.Controllers;
 
 public class GroupController(IGroupService groupService):ControllerBase
 {
-    [HttpGet("get-groups")]
-    public async Task<Response<List<GetGroupDto>>> GetGroupsAsync()
+     [HttpGet("get-group-students-count")]
+    public async Task<List<GetGroupStudent>> GetGroupStudentsCount()
     {
-        return await groupService.GetGroups();
+        return await groupService.GetGroupStudentsCount();
+    }
+    [HttpGet("get-groups")]
+    public async Task<Response<List<GetGroupDto>>> GetGroupsAsync([FromQuery]GroupFilter filter)
+    {
+        return await groupService.GetGroups(filter);
     }
 
     [HttpGet("{groupId:int}")]
