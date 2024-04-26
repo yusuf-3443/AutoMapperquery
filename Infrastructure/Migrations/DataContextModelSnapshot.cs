@@ -162,6 +162,52 @@ namespace Infrastructure.Migrations
                     b.ToTable("MentorGroups");
                 });
 
+            modelBuilder.Entity("Domain.Entities.ProgressBook", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreateAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Grade")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("GroupId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsAttended")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("LateMinutes")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("text");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TimeTableId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdateAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GroupId");
+
+                    b.HasIndex("StudentId");
+
+                    b.HasIndex("TimeTableId");
+
+                    b.ToTable("ProgressBook");
+                });
+
             modelBuilder.Entity("Domain.Entities.Student", b =>
                 {
                     b.Property<int>("Id")
@@ -239,6 +285,42 @@ namespace Infrastructure.Migrations
                     b.ToTable("StudentGroups");
                 });
 
+            modelBuilder.Entity("Domain.Entities.TimeTable", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreateAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("DayOfWeek")
+                        .HasColumnType("integer");
+
+                    b.Property<TimeSpan>("FromTime")
+                        .HasColumnType("interval");
+
+                    b.Property<int>("GroupId")
+                        .HasColumnType("integer");
+
+                    b.Property<TimeSpan>("ToTime")
+                        .HasColumnType("interval");
+
+                    b.Property<DateTime>("UpdateAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GroupId");
+
+                    b.ToTable("TimeTable");
+                });
+
             modelBuilder.Entity("Domain.Entities.Group", b =>
                 {
                     b.HasOne("Domain.Entities.Course", "Course")
@@ -269,6 +351,33 @@ namespace Infrastructure.Migrations
                     b.Navigation("Mentor");
                 });
 
+            modelBuilder.Entity("Domain.Entities.ProgressBook", b =>
+                {
+                    b.HasOne("Domain.Entities.Group", "Group")
+                        .WithMany("ProgressBooks")
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Student", "Student")
+                        .WithMany("ProgressBooks")
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.TimeTable", "TimeTable")
+                        .WithMany("ProgressBooks")
+                        .HasForeignKey("TimeTableId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Group");
+
+                    b.Navigation("Student");
+
+                    b.Navigation("TimeTable");
+                });
+
             modelBuilder.Entity("Domain.Entities.StudentGroup", b =>
                 {
                     b.HasOne("Domain.Entities.Group", "Group")
@@ -288,6 +397,17 @@ namespace Infrastructure.Migrations
                     b.Navigation("Student");
                 });
 
+            modelBuilder.Entity("Domain.Entities.TimeTable", b =>
+                {
+                    b.HasOne("Domain.Entities.Group", "Group")
+                        .WithMany("TimeTables")
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Group");
+                });
+
             modelBuilder.Entity("Domain.Entities.Course", b =>
                 {
                     b.Navigation("Groups");
@@ -297,7 +417,11 @@ namespace Infrastructure.Migrations
                 {
                     b.Navigation("MentorGroups");
 
+                    b.Navigation("ProgressBooks");
+
                     b.Navigation("StudentGroups");
+
+                    b.Navigation("TimeTables");
                 });
 
             modelBuilder.Entity("Domain.Entities.Mentor", b =>
@@ -307,7 +431,14 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Student", b =>
                 {
+                    b.Navigation("ProgressBooks");
+
                     b.Navigation("StudentGroups");
+                });
+
+            modelBuilder.Entity("Domain.Entities.TimeTable", b =>
+                {
+                    b.Navigation("ProgressBooks");
                 });
 #pragma warning restore 612, 618
         }

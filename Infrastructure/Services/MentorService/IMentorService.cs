@@ -7,7 +7,6 @@ namespace Infrastructure.Services.MentorService;
 
 public interface IMentorService
 {
-    Task<Response<List<GetMentorMoreThenOneGroup>>> GetMentorMoreThenOneGroup();
     Task<PagedResponse<List<GetMentorDto>>> GetMentorsAsync(MentorFilter filter);
     Task<Response<GetMentorDto>> GetMentorByIdAsync(int id);
     Task<Response<string>> CreateMentorAsync(AddMentorDto mentor);

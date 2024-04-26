@@ -7,7 +7,7 @@ namespace Infrastructure.Services.StudentService;
 public interface IStudentService
 {
     
-    Task<PagedResponse<List<GetStudentDto>>> GetStudentsAsync(StudentFilter fil);
+    Task<PagedResponse<List<GetStudentDto>>> GetStudentsAsync(StudentFilter filter);
     Task<Response<GetStudentDto>> GetStudentByIdAsync(int id);
     Task<Response<string>> CreateStudentAsync(AddStudentDto student);
     Task<Response<string>> UpdateStudentAsync(UpdateStudentDto student);

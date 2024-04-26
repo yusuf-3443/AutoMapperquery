@@ -113,9 +113,6 @@ namespace Infrastructure.Services.MentorService
             }
         }
 
-        public Task<Response<List<GetMentorMoreThenOneGroup>>> GetMentorMoreThenOneGroup()
-        {
-            throw new NotImplementedException();
-        }
+      
     }
 }

@@ -12,7 +12,7 @@ namespace WebApi.Controllers;
 public class CourseController(ICourseService courseService):ControllerBase
 {
     [HttpGet("get-courses")]
-    public async Task<Response<List<GetCourseDto>>> GetCoursesAsync(CourseFilter filter)
+    public async Task<Response<List<GetCourseDto>>> GetCoursesAsync([FromQuery]CourseFilter filter)
     {
         return await courseService.GetCourses(filter);
     }
