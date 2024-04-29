@@ -123,4 +123,17 @@ public class StudentService(DataContext context, IMapper mapper) : IStudentServi
             return new Response<bool>(HttpStatusCode.InternalServerError, e.Message);
         }
     }
+        public async Task<Response<List<GetStudentDto>>> GetStudentWithScore()
+        {
+            try
+            {
+                var students = await context.Students.Where(s => s.ProgressBooks.Any(p => p.Grade > 90)).ToListAsync();
+                var mapped = mapper.Map<List<GetStudentDto>>(students);
+                return new Response<List<GetStudentDto>>(mapped);
+            }
+            catch (Exception e)
+            {
+                return new Response<List<GetStudentDto>>(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
 }

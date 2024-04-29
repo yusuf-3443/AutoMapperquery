@@ -11,6 +11,24 @@ namespace WebApi.Controllers;
 
 public class CourseController(ICourseService courseService):ControllerBase
 {
+    [HttpGet("get-courses-male-more-female")]
+    public async Task<Response<List<GetCourseDto>>> GetCoursesMaleMoreFemale()
+    {
+        return await courseService.GetCourseMaleMoreFemale();
+    }
+
+    [HttpGet("get-courses-gender")]
+    public async Task<Response<List<GetCourseDto>>> GetCourseWithStudentGender()
+    {
+        return await courseService.GetCourseWithStudentGender();
+    }
+
+      [HttpGet("get-course-with-student-name")]
+    public async Task<Response<List<GetCourseDto>>> GetCourseWithStudentName()
+    {
+        return await courseService.GetCourseWithStudentName();
+    }
+
     [HttpGet("get-courses")]
     public async Task<Response<List<GetCourseDto>>> GetCoursesAsync([FromQuery]CourseFilter filter)
     {

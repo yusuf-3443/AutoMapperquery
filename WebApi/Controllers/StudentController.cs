@@ -9,6 +9,7 @@ namespace WebApi.Controllers;
 [ApiController]
 public class StudentController(IStudentService studentService) : ControllerBase
 {
+
     [HttpGet("get-students")]
     public async Task<Response<List<GetStudentDto>>> GetStudentsAsync ([FromQuery]StudentFilter filter)
     {

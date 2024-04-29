@@ -27,21 +27,23 @@ public class MapperProfile:Profile
         CreateMap<Mentor, AddMentorDto>().ReverseMap();
         CreateMap<Mentor, GetMentorDto>().ReverseMap();
         CreateMap<Mentor, UpdateMentorDto>().ReverseMap();
-                CreateMap<MentorGroup, AddMentorGroupDto>().ReverseMap();
-                CreateMap<MentorGroup, GetMentorGroupDto>().ReverseMap();
-                CreateMap<MentorGroup, UpdateMentorGroupDto>().ReverseMap();
-                                CreateMap<StudentGroup, AddStudentGroupDto>().ReverseMap();
-                                CreateMap<StudentGroup, GetStudentGroupDto>().ReverseMap();
-                                CreateMap<StudentGroup, UpdateStudentGroupDto>().ReverseMap();
-                                CreateMap<TimeTable, AddTimeTableDto>().ReverseMap();
-                                CreateMap<TimeTable, GetTimeTableDto>().ReverseMap();
-                                CreateMap<TimeTable, UpdateTimeTableDto>().ReverseMap();
-                                CreateMap<ProgressBook, AddProgressBookDto>().ReverseMap();
-                                CreateMap<ProgressBook, GetProgressBookDto>().ReverseMap();
-                                CreateMap<ProgressBook, UpdateProgressBookDto>().ReverseMap();
+        CreateMap<MentorGroup, AddMentorGroupDto>().ReverseMap();
+        CreateMap<MentorGroup, GetMentorGroupDto>().ReverseMap();
+        CreateMap<MentorGroup, UpdateMentorGroupDto>().ReverseMap();
+        CreateMap<StudentGroup, AddStudentGroupDto>().ReverseMap();
+        CreateMap<StudentGroup, GetStudentGroupDto>().ReverseMap();
+        CreateMap<StudentGroup, UpdateStudentGroupDto>().ReverseMap();
+        CreateMap<TimeTable, AddTimeTableDto>().ReverseMap();
+        CreateMap<TimeTable, GetTimeTableDto>().ReverseMap();
+        CreateMap<TimeTable, UpdateTimeTableDto>().ReverseMap();
+        CreateMap<ProgressBook, AddProgressBookDto>().ReverseMap();
+        CreateMap<ProgressBook, GetProgressBookDto>().ReverseMap();
+        CreateMap<ProgressBook, UpdateProgressBookDto>().ReverseMap();
 
 
-
+CreateMap<AddTimeTableDto, TimeTable>()
+.ForMember(sDto=>sDto.FromTime, opt=>opt.MapFrom(s=>TimeSpan.Parse(s.FromTime)))
+.ForMember(x=>x.ToTime, opt=>opt.MapFrom(x=>TimeSpan.Parse(x.ToTime)));
 
 
 

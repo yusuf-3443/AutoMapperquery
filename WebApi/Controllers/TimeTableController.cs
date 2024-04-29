@@ -12,7 +12,7 @@ namespace WebApi.Controllers;
 public class TimeTableController(ITimeTableService timeTableService):ControllerBase
 {
     [HttpGet("get-time-tables")]
-    public async Task<Response<List<GetTimeTableDto>>> GetTimeTablesAsync(TimeTableFilter filter)
+    public async Task<Response<List<GetTimeTableDto>>> GetTimeTablesAsync([FromQuery]TimeTableFilter filter)
     {
         return await timeTableService.GetTimeTables(filter);
     }

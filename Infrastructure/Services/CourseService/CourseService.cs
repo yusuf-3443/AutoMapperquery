@@ -2,6 +2,7 @@ using System.Net;
 using AutoMapper;
 using Domain.DTOs.CourseDTO;
 using Domain.Entities;
+using Domain.Enums;
 using Domain.Filters;
 using Domain.Responses;
 using Infrastructure.Data;
@@ -94,4 +95,35 @@ public class CourseService(DataContext context, IMapper mapper) : ICourseService
             return new Response<bool>(HttpStatusCode.InternalServerError, e.Message);
         }
         }
+
+    public async Task<Response<List<GetCourseDto>>> GetCourseWithStudentName()
+        {
+            try
+            {
+                var courses = context.Courses
+         .Where(c => c.Groups.Any(g => g.StudentGroups.Any(sg => sg.Student.FirstName.StartsWith("A")))).ToListAsync();
+                var mapped = mapper.Map<List<GetCourseDto>>(courses);
+                return new Response<List<GetCourseDto>>(mapped);
+            }
+            catch (Exception e)
+            {
+                return new Response<List<GetCourseDto>>(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+                public async Task<Response<GetCourseDto>> GetCourseWithStudentGender()
+        {
+            try
+            {
+            var course = await context.Courses.Where(c => c.Groups
+            .Any(g => g.StudentGroups.Any(sg => sg.Student.Gender == Gender.Male)) && 
+               c.Groups.Any(g => g.StudentGroups.Any(sg => sg.Student.Gender == Gender.Female))).ToListAsync();
+                var mapped = mapper.Map<GetCourseDto>(course);
+                return new Response<GetCourseDto>(mapped);
+            }
+            catch (Exception e)
+            {
+                return new Response<GetCourseDto>(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
 }
